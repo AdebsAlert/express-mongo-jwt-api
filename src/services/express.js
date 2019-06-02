@@ -3,6 +3,7 @@
 const config = require('../config')
 const express = require('express')
 const morgan = require('morgan')
+const mongooseMorgan = require('mongoose-morgan')
 const cors = require('cors')
 const helmet = require('helmet')
 const bodyParser = require('body-parser')
@@ -12,6 +13,20 @@ const passport = require('passport')
 const passportJwt = require('../services/passport')
 
 const app = express()
+
+// logger
+app.use(mongooseMorgan({
+  collection: 'error_logs',
+  connectionString: config.mongo.uri
+},
+{
+  skip: function (req, res) {
+    return res.statusCode < 400
+  }
+},
+'short'
+))
+
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cors())
